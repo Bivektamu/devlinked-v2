@@ -4,9 +4,9 @@ import connectDB from '../dataLayer'
 import rootRouter from '../routes/'
 
 const app = express()
+app.use(express.json())
 const PORT = process.env.PORT || 2000
 
-console.log(process.env.MONGO_URI)
 connectDB()
 app.use(rootRouter)
 
