@@ -27,7 +27,6 @@ authRouter.post('/login', checkSchema(loginUserValidationschema), async (req:Req
         if(!isMatch) {
             return res.status(401).send('Bad Credentials')
         }
-        
         req.session.visited = true
         req.session.user = userExists._id.toString()
         return res.status(200).send('Logged In')

@@ -18,12 +18,12 @@
     "express-session": "^1.18.0",
     "express-validator": "^7.0.1",
     "gravatar": "^1.8.2",
+    "@types/express-session": "^1.18.0",
     "mongoose": "^8.3.2"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
-    "@types/express-session": "^1.18.0",
     "@types/express-validator": "^3.0.0",
     "@types/gravatar": "^1.8.6",
     "nodemon": "^3.1.0",
