@@ -8,9 +8,9 @@ import User from "../dataLayer/schema/User";
 const userRouter = Router()
 
 userRouter.get('/', async (req, res) => {
-    if(!req.session.user) {
-        return res.status(401).send('Not authenticated')
-    }
+    // if(!req.session.user) {
+    //     return res.status(401).send('Not authenticated')
+    // }
 
     try {
         const users = await User.find()
@@ -24,6 +24,7 @@ userRouter.get('/', async (req, res) => {
     }
 })
 
+// add user
 userRouter.post('/add', checkSchema(createUserValidationschema), async (req: Request, res: Response) => {
 
     const err = validationResult(req)
@@ -68,6 +69,7 @@ userRouter.post('/add', checkSchema(createUserValidationschema), async (req: Req
     }
 })
 
+// Delete user by ID
 userRouter.delete('/delete/:id', async (req: Request, res: Response) => {
     if(!req.session.user || req.session.user !== req.params.id) {
         return res.status(401).send('Not Authenticated')
@@ -91,6 +93,21 @@ userRouter.delete('/delete/:id', async (req: Request, res: Response) => {
             return res.status(500).send(err.message)
         }
 
+    }
+})
+
+
+// Delete all users
+userRouter.delete('/delete', async(req:Request, res:Response)=> {
+    try {
+        await User.deleteMany()
+        return res.status(201).send('Deleted')
+
+        
+    } catch (error) {
+        if(error instanceof Error) {
+            return res.status(500).send(error.message)
+        }
     }
 })
 
