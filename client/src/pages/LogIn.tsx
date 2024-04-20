@@ -23,6 +23,7 @@ const LogIn = () => {
         if (Object.keys(errs).length > 0) {
             return setErrors({ ...errs })
         }
+        
     }
 
     const handleChange = (e:ChangeEvent<HTMLInputElement>) => {

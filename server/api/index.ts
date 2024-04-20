@@ -1,11 +1,13 @@
 import express, {Request, Response} from 'express'
 import 'dotenv/config'
 import session from 'express-session'
+import cors from 'cors'
 
 import connectDB from '../dataLayer'
 import rootRouter from '../routes/'
 
 const app = express()
+app.use(cors())
 app.use(express.json())
 const PORT = process.env.PORT || 2000
 

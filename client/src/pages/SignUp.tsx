@@ -1,6 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react'
 import { FormData } from '../components/types'
 import validateForm from '../components/helper/validate'
+import { addNewUser } from '../components/helper/auth'
 
 const SignUp = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -19,6 +20,8 @@ const SignUp = () => {
     if (Object.keys(errs).length > 0) {
       return setErrors(errs)
     }
+    addNewUser(formData)
+
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
