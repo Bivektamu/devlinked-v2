@@ -1,7 +1,9 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react'
-import { FormData } from '../components/types'
-import validateForm from '../components/helper/validate'
-import { addNewUser } from '../components/helper/auth'
+import { ErrType, FormData } from '../components/types'
+import validateForm from '../components/auth/validate'
+import { Navigate } from "react-router-dom"
+import { addError } from "../components/store/slices/errorSlice"
+import { useStoreDispatch } from "../components/store"
 
 const SignUp = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -10,6 +12,42 @@ const SignUp = () => {
     email: '',
     password: ''
   })
+    const dispatch = useStoreDispatch()
+
+
+  const addNewUser = async (formData: FormData) => {
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const body = JSON.stringify(formData)
+
+    try {
+
+      const res = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/users/add`, {
+        method: 'POST',
+        headers,
+        body
+      })
+      if (!res.ok) {
+        const error = await res.json()
+        if (error) {
+          throw new Error(error)
+        }
+      }
+      <Navigate to="/login" />
+    }
+
+    catch (error) {
+      if (error instanceof Error) {
+        dispatch(addError({
+          msg: error.message,
+          type: ErrType.ERROR
+        }))
+      }
+    }
+    return true
+  }
+
 
   const [errors, setErrors] = useState<Partial<FormData>>({})
 
@@ -21,7 +59,6 @@ const SignUp = () => {
       return setErrors(errs)
     }
     addNewUser(formData)
-
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
