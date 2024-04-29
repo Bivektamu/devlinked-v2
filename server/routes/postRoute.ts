@@ -5,7 +5,9 @@ import User from "../dataLayer/schema/User";
 import Post from "../dataLayer/schema/Post";
 const postRoute = Router()
 
-postRoute.get('/', auth, async (req: Request, res: Response) => {
+postRoute.get('/', 
+// auth,
+ async (req: Request, res: Response) => {
     try {
         const posts = await Post.find()
         return res.status(200).send(posts)
@@ -22,7 +24,7 @@ postRoute.get('/', auth, async (req: Request, res: Response) => {
 //@access   Private
 postRoute.post(
     '/add',
-    auth,
+    // auth,
     checkSchema({
         text: {
             notEmpty: {

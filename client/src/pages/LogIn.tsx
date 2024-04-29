@@ -1,40 +1,68 @@
-import { ChangeEvent, FormEvent, useState } from 'react'
-import { FormData } from '../components/types'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import { SignUpFormData, Status } from '../store/types'
+
+import { Navigate } from 'react-router-dom'
+import { useStoreDispatch } from '../store'
+import { auth, logIn } from '../store/slices/authSlice'
+import { useSelector } from 'react-redux'
+import { addToast } from '../store/slices/toastSlice'
+import { validateLogInForm } from '../components/auth/validate'
 
 const LogIn = () => {
 
-    const [formData, setFormData] = useState<Partial<FormData>>({
+    const dispatch = useStoreDispatch()
+
+    const newAuth = useSelector(auth)
+    const { status, msg, isLoggedIn } = newAuth
+
+
+    useEffect(() => {
+        if (status === Status.REJECTED && msg) {
+            dispatch(addToast(msg))
+        }
+    }, [status])
+
+
+    const [formData, setFormData] = useState<Pick<SignUpFormData, 'email' | 'password'>>({
         email: '',
         password: ''
     })
 
-    const [errors, setErrors] = useState<Partial<FormData>>({})
+
+    const [errors, setErrors] = useState<Partial<SignUpFormData>>({})
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         e.stopPropagation()
-        const errs: Partial<FormData> = {}
-        if (!email) {
-            errs.email = 'Email is Required'
-        }
-        if (!password) {
-            errs.password = 'Password is Required'
-        }
+
+        const errs = validateLogInForm({email, password})
+        
         if (Object.keys(errs).length > 0) {
             return setErrors({ ...errs })
         }
-        
+        else {
+            const data: Pick<SignUpFormData, 'email' | 'password'> = {
+                email: email,
+                password: password
+            }
+            dispatch(logIn(data))
+        }
     }
 
-    const handleChange = (e:ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
-        if (errors[e.target.name as keyof FormData]) {
+        if (errors[e.target.name as keyof SignUpFormData]) {
             setErrors(prev => ({ ...prev, [e.target.name]: '' }))
         }
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
     const { email, password } = formData
+
+    if (isLoggedIn) {
+        return <Navigate to='/' />
+    }
+
 
 
     return (
@@ -52,7 +80,7 @@ const LogIn = () => {
                     </div>
                     <div className="grid gap-2">
                         <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="password">Password</label>
-                        <input className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="password" onChange={handleChange} value={password} name='password' type="password" />
+                        <input className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" id="password" onChange={handleChange} value={password} name='password' type="text" />
                         {errors.password && <span className='text-red-500 text-xs mb-2'>{errors.password}</span>}
                     </div>
                 </div>

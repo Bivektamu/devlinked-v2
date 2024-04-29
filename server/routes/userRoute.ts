@@ -8,18 +8,18 @@ import User from "../dataLayer/schema/User";
 const userRouter = Router()
 
 userRouter.get('/', async (req, res) => {
-    // if(!req.session.user) {
-    //     return res.status(401).send('Not authenticated')
-    // }
+    if(!req.session.user) {
+        return res.status(401).json('Not authenticated')
+    }
 
     try {
         const users = await User.find()
 
-        return res.status(200).send(users)
+        return res.status(200).json(users)
 
     } catch (error) {
         if (error instanceof Error) {
-            res.status(5000).send(error.message)
+            res.status(5000).json(error.message)
         }
     }
 })
@@ -29,14 +29,16 @@ userRouter.post('/add', checkSchema(createUserValidationschema), async (req: Req
 
     const err = validationResult(req)
     if (!err.isEmpty()) {
-        res.status(400).send({ errors: err.array() })
+        res.status(400).json({ errors: err.array() })
     }
 
     const { firstName, lastName, email, password } = matchedData(req)
     try {
-        const userExists = await User.findOne({ email })
+        const lowerEmail = email.toLowerCase()
+
+        const userExists = await User.findOne({ email: lowerEmail })
         if (userExists) {
-            return res.status(400).json('User already Exists')
+            return res.status(400).json({error: 'User already Exists'})
         }
         const avatar = gravatar.url(email, {
             s: '200',
@@ -46,23 +48,23 @@ userRouter.post('/add', checkSchema(createUserValidationschema), async (req: Req
         const user = new User({
             firstName,
             lastName,
-            email,
+            email:lowerEmail,
             password,
             avatar
 
         })
 
-        const salt = brcypt.genSaltSync(10)
+        const salt = brcypt.genSaltSync(8)
         user.password = brcypt.hashSync(password, salt)
 
         await user.save()
 
-        return res.status(201).send('Account Created')
+        return res.status(201).json({msg: 'Account Created'})
 
 
     } catch (error) {
         if (error instanceof Error) {
-            return res.status(500).send(error.message)
+            return res.status(500).json(error.message)
         }
 
     }
@@ -71,13 +73,13 @@ userRouter.post('/add', checkSchema(createUserValidationschema), async (req: Req
 // Delete user by ID
 userRouter.delete('/delete/:id', async (req: Request, res: Response) => {
     if (!req.session.user || req.session.user !== req.params.id) {
-        return res.status(401).send('Not Authenticated')
+        return res.status(401).json('Not Authenticated')
     }
     try {
         const { id } = req.params
         const userExists = await User.findById(id)
         if (!userExists) {
-            return res.status(400).send('Bad Request')
+            return res.status(400).json('Bad Request')
         }
 
         await User.findOneAndDelete({
@@ -85,11 +87,11 @@ userRouter.delete('/delete/:id', async (req: Request, res: Response) => {
         })
         req.session.user = ''
 
-        return res.status(201).send('Deleted')
+        return res.status(201).json('Deleted')
 
     } catch (err) {
         if (err instanceof Error) {
-            return res.status(500).send(err.message)
+            return res.status(500).json(err.message)
         }
 
     }
@@ -100,12 +102,12 @@ userRouter.delete('/delete/:id', async (req: Request, res: Response) => {
 userRouter.delete('/delete', async (req: Request, res: Response) => {
     try {
         await User.deleteMany()
-        return res.status(201).send('Deleted')
+        return res.status(201).json('Deleted')
 
 
     } catch (error) {
         if (error instanceof Error) {
-            return res.status(500).send(error.message)
+            return res.status(500).json(error.message)
         }
     }
 })

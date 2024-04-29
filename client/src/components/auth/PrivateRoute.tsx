@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { Component, ReactElement, useState } from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { auth } from "../../store/slices/authSlice";
 
-const PrivateRoute = ({ Component }) => {
- 
-const [isAuthenticated, setIsAuthenticated] = useState(false);
 
- // Your authentication logic goes here...
- 
-  return isAuthenticated ? <Component /> : <Navigate to="/login" />;
+type Prop = {
+  Component: () => JSX.Element
+}
+
+
+const PrivateRoute = ({ Component }: Prop) => {
+
+
+  const { isLoggedIn } = useSelector(auth)
+
+  return isLoggedIn ? <Component /> : <Navigate to="/" />;
 };
 export default PrivateRoute;

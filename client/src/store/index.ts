@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import errorSlice from "./slices/errorSlice";
+import toastSlice from "./slices/toastSlice";
 import { useDispatch } from "react-redux";
+import authSlice, { auth } from "./slices/authSlice";
 
 const Store = configureStore({
     reducer: {
-        errors: errorSlice
+        toasts: toastSlice,
+        auth: authSlice
     }
 })
 

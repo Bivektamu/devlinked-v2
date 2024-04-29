@@ -28,6 +28,7 @@ authRouter.post('/login', checkSchema(loginUserValidationschema), async (req: Re
         if (!isMatch) {
             return res.status(401).json('Bad Credentials')
         }
+        console.log('logged in')
         req.session.visited = true
         req.session.user = userExists._id.toString()
         return res.sendStatus(200)
@@ -41,9 +42,7 @@ authRouter.post('/login', checkSchema(loginUserValidationschema), async (req: Re
 
 })
 
-authRouter.get('/status',  (req, res) => {
-   
-    
+authRouter.get('/status', (req, res) => {
     if (req.session.user) {
         return res.sendStatus(200)
     }

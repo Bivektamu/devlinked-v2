@@ -11,6 +11,6 @@ rootRouter.get('/api', (req,res)=> {
 })
 rootRouter.use('/api/users', userRouter)
 rootRouter.use('/api/post', postRoute)
-rootRouter.use('/api/', authRouter)
+rootRouter.use('/api/auth', authRouter)
 
 export default rootRouter
